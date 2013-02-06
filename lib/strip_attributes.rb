@@ -31,12 +31,12 @@ module StripAttributes
   end
 
   def self.strip_record(record, options = nil)
-    attributes = narrow(record.attributes, options)
+    attribute_names = narrow(record.attribute_names, options)
 
-    attributes.each do |attr, value|
-      original_value = value
-      value = strip_string(value, options)
-      record[attr] = value if original_value != value
+    attribute_names.each do |attribute_name|
+      original_value = record[attribute_name]
+      value = strip_string(original_value, options)
+      record[attribute_name] = value if original_value != value
     end
 
     record
@@ -90,15 +90,15 @@ module StripAttributes
 
   # Necessary because Rails has removed the narrowing of attributes using :only
   # and :except on Base#attributes
-  def self.narrow(attributes, options = {})
+  def self.narrow(attribute_names, options = {})
     if except = options && options[:except]
       except = Array(except).collect { |attribute| attribute.to_s }
-      attributes.except(*except)
+      attribute_names - except
     elsif only = options && options[:only]
       only = Array(only).collect { |attribute| attribute.to_s }
-      attributes.slice(*only)
+      attribute_names & only
     else
-      attributes
+      attribute_names
     end
   end
 
