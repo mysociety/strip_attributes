@@ -15,6 +15,10 @@ class Tableless
   include ActiveAttr::Serialization
 
   include ActiveModel::Validations::Callbacks
+
+  def attribute_names
+    @attribute_names ||= attributes.keys
+  end
 end
 
 # Avoid annoying deprecation warning
