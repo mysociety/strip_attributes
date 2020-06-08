@@ -13,11 +13,11 @@ class SampleMockRecord < Tableless
   attribute :unstripped1
   attribute :unstripped2
   attribute :unstripped3
-  strip_attributes :only => [:stripped1, :stripped2, :stripped3]
+  strip_attributes only: [:stripped1, :stripped2, :stripped3]
 
   attribute :collapsed
   attribute :uncollapsed
-  strip_attributes :only => [:collapsed], :collapse_spaces => true
+  strip_attributes only: [:collapsed], collapse_spaces: true
 end
 
 describe SampleMockRecord do
@@ -91,5 +91,15 @@ describe SampleMockRecord do
     rescue
       assert true
     end
+  end
+
+  it "should take a list of arguments" do
+    must strip_attribute(:stripped1, :stripped2, :stripped3)
+    wont strip_attribute(:unstripped1, :unstripped2, :unstripped3)
+  end
+
+  it "should alias strip_attribute to strip_attributes" do
+    must strip_attributes(:stripped1, :stripped2, :stripped3)
+    wont strip_attributes(:unstripped1, :unstripped2, :unstripped3)
   end
 end

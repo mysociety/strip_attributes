@@ -6,26 +6,35 @@ module StripAttributes
     # RSpec Examples:
     #
     #   it { is_expected.to strip_attribute(:first_name) }
+    #   it { is_expected.to strip_attributes(:first_name, :last_name) }
     #   it { is_expected.not_to strip_attribute(:password) }
+    #   it { is_expected.not_to strip_attributes(:password, :encrypted_password) }
     #
     # Minitest Matchers Examples:
     #
     #   must { strip_attribute :first_name }
+    #   must { strip_attributes(:first_name, :last_name) }
     #   wont { strip_attribute :password }
-    def strip_attribute(attribute)
-      StripAttributeMatcher.new(attribute)
+    #   wont { strip_attributes(:password, :encrypted_password) }
+    def strip_attribute(*attributes)
+      StripAttributeMatcher.new(attributes)
     end
 
+    alias_method :strip_attributes, :strip_attribute
+
     class StripAttributeMatcher
-      def initialize(attribute)
-        @attribute = attribute
+      def initialize(attributes)
+        @attributes = attributes
         @options = {}
       end
 
       def matches?(subject)
-        subject.send("#{@attribute}=", " string ")
-        subject.valid?
-        subject.send(@attribute) == "string" and collapse_spaces?(subject)
+        @attributes.all? do |attribute|
+          @attribute = attribute
+          subject.send("#{@attribute}=", " string ")
+          subject.valid?
+          subject.send(@attribute) == "string" and collapse_spaces?(subject)
+        end
       end
 
       def collapse_spaces
@@ -45,7 +54,7 @@ module StripAttributes
       alias_method :negative_failure_message,       :failure_message_when_negated # RSpec 1.1
 
       def description
-        "#{expectation(false)} whitespace from ##{@attribute}"
+        "#{expectation(false)} whitespace from #{@attributes.map {|el| "##{el}" }.to_sentence}"
       end
 
       private
