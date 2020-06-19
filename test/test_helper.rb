@@ -17,7 +17,7 @@ class Tableless
   include ActiveModel::Validations::Callbacks
 
   def attribute_names
-    self.class.attribute_names
+    @attribute_names ||= attributes.keys
   end
 end
 
